@@ -1,5 +1,5 @@
 {
-  "name": "SECamb CFR Toolbox",
+  "name": "CFR Toolbox",
   "short_name": "CFR Toolbox",
   "start_url": "./index.html",
   "display": "standalone",
@@ -21,6 +21,7 @@
   ],
   "splash_pages": null
 }
+
 
 
 
