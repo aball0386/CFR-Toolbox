@@ -42,6 +42,10 @@
       transition: background-color 0.3s;
     }
 
+    #installBtn {
+      display: none; /* Hidden until beforeinstallprompt fires */
+    }
+
     #settingsMenu {
       display: none;
       border: 1px solid var(--theme-color);
@@ -96,7 +100,7 @@
   </div>
 
   <script>
-    // Register service worker
+    // Service Worker registration
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('service-worker.js')
         .then(() => console.log('Service Worker Registered'))
@@ -110,20 +114,23 @@
     window.addEventListener('beforeinstallprompt', (e) => {
       e.preventDefault();
       deferredPrompt = e;
-      installBtn.style.display = 'inline-block';
+      installBtn.style.display = 'inline-block'; // Show the button when prompt available
+    });
 
-      installBtn.addEventListener('click', () => {
-        installBtn.style.display = 'none';
-        deferredPrompt.prompt();
-        deferredPrompt.userChoice.then(choiceResult => {
-          if (choiceResult.outcome === 'accepted') {
-            console.log('User accepted the install prompt');
-          } else {
-            console.log('User dismissed the install prompt');
-          }
-          deferredPrompt = null;
-        });
-      });
+    installBtn.addEventListener('click', async () => {
+      installBtn.style.display = 'none';
+      if (!deferredPrompt) return;
+
+      deferredPrompt.prompt();
+      const choiceResult = await deferredPrompt.userChoice;
+
+      if (choiceResult.outcome === 'accepted') {
+        console.log('User accepted the install prompt');
+      } else {
+        console.log('User dismissed the install prompt');
+      }
+
+      deferredPrompt = null;
     });
 
     // Settings menu toggle
@@ -149,7 +156,7 @@
       }
     });
 
-    // Theme color radio buttons
+    // Theme color radios
     const themeRadios = document.querySelectorAll('input[name="themeColor"]');
     themeRadios.forEach(radio => {
       radio.addEventListener('change', () => {
@@ -180,8 +187,7 @@
           });
           el.innerHTML = bionicWords.join(' ');
         } else {
-          // Reset text content to plain text (remove bold)
-          el.textContent = el.textContent;
+          el.textContent = el.textContent; // Reset to plain text (removes bold)
         }
       });
     }
@@ -193,6 +199,7 @@
 
 </body>
 </html>
+
 
 
 
