@@ -8,12 +8,13 @@
   "orientation": "portrait-primary",
   "icons": [
     {
-      "src": "icons/cfr_toolbox_icon_512.png",
+      "src": "cfr_toolbox_icon_512.png",
       "sizes": "512x512",
       "type": "image/png"
     }
   ]
 }
+
 
 
 
