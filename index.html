@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>SECamb CFR Toolbox</title>
+<title>CFR Toolbox</title>
 
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json" />
@@ -133,9 +133,28 @@
     margin-bottom: 10px;
   }
 
-  #stopwatch button {
+  /* Stopwatch buttons container */
+  .stopwatch-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 10px;
+  }
+
+  .stopwatch-buttons button {
     min-width: 120px;
-    margin: 0 5px;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+
+  .stopwatch-buttons button:hover {
+    background-color: #004d38;
   }
 
   #settingsPanel {
@@ -150,7 +169,7 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     color: var(--text-color);
-    width: 70px;
+    width: 220px;
   }
 
   #settingsPanel label {
@@ -371,9 +390,11 @@
     }
   }
 
-  // Stopwatch logic
+  // Stopwatch toggle start/stop and reset
+
   let stopwatchInterval = null;
   let elapsedTime = 0;
+  const startStopBtn = document.getElementById('startStopBtn');
 
   function updateStopwatchDisplay() {
     const hours = Math.floor(elapsedTime / 3600);
@@ -385,37 +406,38 @@
       `${secs.toString().padStart(2,'0')}`;
   }
 
-  function startStopwatch() {
-    if (stopwatchInterval) return;
-    stopwatchInterval = setInterval(() => {
-      elapsedTime++;
-      updateStopwatchDisplay();
-    }, 1000);
-  }
-
-  function stopStopwatch() {
-    clearInterval(stopwatchInterval);
-    stopwatchInterval = null;
+  function toggleStopwatch() {
+    if (stopwatchInterval) {
+      // Stop it
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+      startStopBtn.textContent = 'Start';
+    } else {
+      // Start it
+      stopwatchInterval = setInterval(() => {
+        elapsedTime++;
+        updateStopwatchDisplay();
+      }, 1000);
+      startStopBtn.textContent = 'Stop';
+    }
   }
 
   function resetStopwatch() {
-    stopStopwatch();
+    if (stopwatchInterval) {
+      clearInterval(stopwatchInterval);
+      stopwatchInterval = null;
+      startStopBtn.textContent = 'Start';
+    }
     elapsedTime = 0;
     updateStopwatchDisplay();
   }
 
   updateStopwatchDisplay();
-
-  // Register Service Worker
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('sw.js')
-      .then(() => console.log('Service Worker registered'))
-      .catch(err => console.error('Service Worker registration failed:', err));
-  }
 </script>
 
 </body>
 </html>
+
 
 
 
