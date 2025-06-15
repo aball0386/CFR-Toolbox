@@ -1,204 +1,400 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>CFR Toolbox</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>SECamb CFR Toolbox</title>
 
-  <!-- Link to manifest -->
-  <link rel="manifest" href="manifest.json" />
+<!-- PWA manifest -->
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#006747" />
 
-  <!-- Theme color meta -->
-  <meta name="theme-color" content="#007A33" />
+<style>
+  :root {
+    --ambulance-green: #006747;
+    --responder-red: #a91f1f;
+    --primary-color: var(--ambulance-green);
+    --background-color: #e9f0f8;
+    --text-color: black;
+    --font-family: Arial, sans-serif;
+  }
 
-  <!-- Open Dyslexic font as optional -->
-  <link href="https://fonts.googleapis.com/css2?family=Open+Dyslexic&display=swap" rel="stylesheet" />
+  /* Theme color switch */
+  .responder-red {
+    --primary-color: var(--responder-red);
+  }
 
-  <style>
-    :root {
-      --theme-color: #007A33;
-      --background-color: #f0f0f0;
-      --text-color: #000;
-      --font-family: Arial, sans-serif;
-    }
+  /* Dark mode */
+  .dark-mode {
+    --background-color: #121212;
+    --text-color: #e0e0e0;
+  }
 
-    body {
-      font-family: var(--font-family);
-      margin: 2rem;
-      background-color: var(--background-color);
-      color: var(--text-color);
-      transition: background-color 0.3s, color 0.3s, font-family 0.3s;
-    }
+  /* Bionic reading simple effect - bold first half of each word */
+  .bionic-reading * {
+    font-family: Arial, sans-serif;
+  }
+  .bionic-reading p, .bionic-reading button {
+    font-weight: normal;
+  }
+  .bionic-reading span.bionic {
+    font-weight: 700;
+  }
 
-    button {
-      background-color: var(--theme-color);
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 1rem;
-      padding: 10px 20px;
-      cursor: pointer;
-      margin-right: 1rem;
-      transition: background-color 0.3s;
-    }
+  body {
+    font-family: var(--font-family);
+    background: url('icons/secamb.png') no-repeat center center fixed;
+    background-size: 40% auto;
+    background-color: var(--background-color);
+    background-blend-mode: lighten;
+    margin: 0;
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
+    color: var(--text-color);
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
 
-    #installBtn {
-      display: none; /* Hidden until beforeinstallprompt fires */
-    }
+  /* Light overlay */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(233, 240, 248, 0.75);
+    pointer-events: none;
+    z-index: -1;
+    transition: background 0.3s ease;
+  }
 
-    #settingsMenu {
-      display: none;
-      border: 1px solid var(--theme-color);
-      padding: 1rem;
-      margin-top: 1rem;
-      background: white;
-      max-width: 400px;
-    }
+  .dark-mode body::before {
+    background: rgba(18, 18, 18, 0.85);
+  }
 
-    label {
-      cursor: pointer;
-    }
-  </style>
+  header {
+    background-color: var(--primary-color);
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+    color: var(--text-color);
+    user-select: none;
+  }
+
+  header img {
+    height: 50px;
+    object-fit: contain;
+  }
+
+  header h1 {
+    margin: 0;
+    font-size: 1.8rem;
+    flex-grow: 1;
+    text-align: center;
+    font-weight: 600;
+    color: black; /* always black as requested */
+  }
+
+  /* Menu button */
+  #menuBtn {
+    background: transparent;
+    border: none;
+    font-size: 2rem;
+    cursor: pointer;
+    color: var(--text-color);
+    user-select: none;
+  }
+
+  .toolbox {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px 30px;
+    width: 100%;
+    max-width: 600px;
+    margin: 40px auto 40px auto;
+    box-sizing: border-box;
+    justify-items: center;
+  }
+
+  button {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    min-width: 200px;
+    text-align: center;
+    transition: background-color 0.3s ease;
+  }
+
+  button:hover {
+    background-color: #004d38;
+  }
+
+  #stopwatch {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+
+  #time {
+    font-size: 2rem;
+    margin-bottom: 10px;
+  }
+
+  #stopwatch button {
+    min-width: 120px;
+    margin: 0 5px;
+  }
+
+  /* Settings panel */
+  #settingsPanel {
+    display: none;
+    position: fixed;
+    top: 60px;
+    right: 10px;
+    background: var(--background-color);
+    border: 1px solid var(--primary-color);
+    padding: 15px;
+    z-index: 1000;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.2);
+    color: var(--text-color);
+    width: 220px;
+  }
+
+  #settingsPanel label {
+    display: block;
+    margin: 8px 0;
+    cursor: pointer;
+  }
+
+  input[type="checkbox"] {
+    margin-right: 8px;
+    cursor: pointer;
+  }
+</style>
 </head>
 <body>
 
-  <h1>CFR Toolbox</h1>
-  <p>Your handy toolbox app for Community First Responders.</p>
-  <p>This app helps you stay ready, focused, and equipped.</p>
+<header>
+  <img src="icons/nhs.png" alt="NHS Logo" />
+  <h1>SECamb CFR Toolbox</h1>
+  <button id="menuBtn" aria-label="Toggle menu" onclick="toggleMenu()">☰</button>
+  <img src="icons/secamb.png" alt="SECamb Logo" />
+</header>
 
-  <button id="installBtn">Install App</button>
-  <button id="settingsBtn">Settings ⚙️</button>
+<div id="settingsPanel" role="region" aria-label="Settings menu">
+  <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
+  <label><input type="checkbox" id="themeColorToggle"> Responder Red Theme</label>
+  <label><input type="checkbox" id="bionicToggle"> Bionic Reading</label>
+</div>
 
-  <!-- Settings Menu -->
-  <div id="settingsMenu">
-    <h2>Settings</h2>
-    
-    <label>
-      <input type="checkbox" id="darkModeToggle" />
-      Enable Dark Mode
-    </label>
-    <br /><br />
+<div class="toolbox">
+  <button onclick="openApp('uk.co.classprofessional.cfr')">Responder Plus</button>
+  <button onclick="openApp('com.gumptionmultimedia.news2chart')">NEWS2</button>
+  <button onclick="openApp('com.goassemble.app')">Assemble</button>
+  <button onclick="openApp('uk.co.terrafix.nma')">NMA</button>
+  <button onclick="openApp('com.what3words.android', 'https://what3words.com')">W3W</button>
+  <button onclick="openApp('com.softwareeurope.expensesmobile')">CFR Expenses</button>
+  <button onclick="openApp('com.microsoft.office.outlook', null, true)">Trust Email</button>
+  <button onclick="openContacts()">Contacts</button>
+  <button onclick="openWebsite('https://aball0386.github.io/Falls-Assist-App/index.html')">Falls Assist</button>
+</div>
 
-    <label>
-      <input type="radio" name="themeColor" value="green" checked />
-      Ambulance Green Theme
-    </label>
-    <br />
-    <label>
-      <input type="radio" name="themeColor" value="red" />
-      Emergency Red Theme
-    </label>
-    <br /><br />
+<div id="stopwatch">
+  <div id="time">00:00:00</div>
+  <button onclick="startStopwatch()">Start</button>
+  <button onclick="stopStopwatch()">Stop</button>
+  <button onclick="resetStopwatch()">Reset</button>
+</div>
 
-    <label>
-      <input type="checkbox" id="bionicReadingToggle" />
-      Enable Bionic Reading Text
-    </label>
-    <br /><br />
+<script>
+  // Menu toggle
+  function toggleMenu() {
+    const panel = document.getElementById('settingsPanel');
+    panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
+  }
 
-    <button id="closeSettingsBtn">Close Settings</button>
-  </div>
+  // Dark mode toggle
+  document.getElementById('darkModeToggle').addEventListener('change', e => {
+    if(e.target.checked) {
+      document.body.classList.add('dark-mode');
+    } else {
+      document.body.classList.remove('dark-mode');
+    }
+    localStorage.setItem('darkMode', e.target.checked);
+  });
 
-  <script>
-    // Service Worker registration
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('service-worker.js')
-        .then(() => console.log('Service Worker Registered'))
-        .catch(err => console.error('Service Worker registration failed:', err));
+  // Theme color toggle
+  document.getElementById('themeColorToggle').addEventListener('change', e => {
+    if(e.target.checked) {
+      document.documentElement.classList.add('responder-red');
+    } else {
+      document.documentElement.classList.remove('responder-red');
+    }
+    localStorage.setItem('themeColor', e.target.checked ? 'red' : 'green');
+  });
+
+  // Bionic reading toggle
+  document.getElementById('bionicToggle').addEventListener('change', e => {
+    if(e.target.checked) {
+      document.body.classList.add('bionic-reading');
+      applyBionicReading();
+    } else {
+      document.body.classList.remove('bionic-reading');
+      removeBionicReading();
+    }
+    localStorage.setItem('bionicReading', e.target.checked);
+  });
+
+  // Load saved preferences
+  window.onload = () => {
+    if(localStorage.getItem('darkMode') === 'true') {
+      document.body.classList.add('dark-mode');
+      document.getElementById('darkModeToggle').checked = true;
+    }
+    if(localStorage.getItem('themeColor') === 'red') {
+      document.documentElement.classList.add('responder-red');
+      document.getElementById('themeColorToggle').checked = true;
+    }
+    if(localStorage.getItem('bionicReading') === 'true') {
+      document.body.classList.add('bionic-reading');
+      document.getElementById('bionicToggle').checked = true;
+      applyBionicReading();
+    }
+  };
+
+  // Simple bionic reading effect: bold first half of each word in toolbox and stopwatch
+  function applyBionicReading() {
+    const elements = document.querySelectorAll('.toolbox button, #stopwatch');
+    elements.forEach(el => {
+      const words = el.textContent.split(' ');
+      const newHtml = words.map(word => {
+        const mid = Math.ceil(word.length / 2);
+        return `<span class="bionic">${word.slice(0, mid)}</span>${word.slice(mid)}`;
+      }).join(' ');
+      el.innerHTML = newHtml;
+    });
+  }
+  function removeBionicReading() {
+    // Reset buttons and stopwatch text to original text content (reload page recommended)
+    // For simplicity, reload page to clear formatting:
+    location.reload();
+  }
+
+  // Open app with fallback to Play Store
+  function openApp(packageName, fallbackUrl = null, isOutlook = false) {
+    if (!packageName) return;
+
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (!isAndroid) {
+      if (fallbackUrl) {
+        window.open(fallbackUrl, '_blank');
+      } else {
+        alert('This function works best on Android devices.');
+      }
+      return;
     }
 
-    // Install prompt logic
-    let deferredPrompt;
-    const installBtn = document.getElementById('installBtn');
-
-    window.addEventListener('beforeinstallprompt', (e) => {
-      e.preventDefault();
-      deferredPrompt = e;
-      installBtn.style.display = 'inline-block'; // Show the button when prompt available
-    });
-
-    installBtn.addEventListener('click', async () => {
-      installBtn.style.display = 'none';
-      if (!deferredPrompt) return;
-
-      deferredPrompt.prompt();
-      const choiceResult = await deferredPrompt.userChoice;
-
-      if (choiceResult.outcome === 'accepted') {
-        console.log('User accepted the install prompt');
-      } else {
-        console.log('User dismissed the install prompt');
-      }
-
-      deferredPrompt = null;
-    });
-
-    // Settings menu toggle
-    const settingsBtn = document.getElementById('settingsBtn');
-    const settingsMenu = document.getElementById('settingsMenu');
-    const closeSettingsBtn = document.getElementById('closeSettingsBtn');
-    settingsBtn.addEventListener('click', () => {
-      settingsMenu.style.display = 'block';
-    });
-    closeSettingsBtn.addEventListener('click', () => {
-      settingsMenu.style.display = 'none';
-    });
-
-    // Dark mode toggle
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    darkModeToggle.addEventListener('change', () => {
-      if (darkModeToggle.checked) {
-        document.documentElement.style.setProperty('--background-color', '#222');
-        document.documentElement.style.setProperty('--text-color', '#eee');
-      } else {
-        document.documentElement.style.setProperty('--background-color', '#f0f0f0');
-        document.documentElement.style.setProperty('--text-color', '#000');
-      }
-    });
-
-    // Theme color radios
-    const themeRadios = document.querySelectorAll('input[name="themeColor"]');
-    themeRadios.forEach(radio => {
-      radio.addEventListener('change', () => {
-        if (radio.checked) {
-          if (radio.value === 'green') {
-            document.documentElement.style.setProperty('--theme-color', '#007A33');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#007A33');
-          } else if (radio.value === 'red') {
-            document.documentElement.style.setProperty('--theme-color', '#D32F2F');
-            document.querySelector('meta[name="theme-color"]').setAttribute('content', '#D32F2F');
-          }
-        }
-      });
-    });
-
-    // Bionic Reading toggle
-    const bionicToggle = document.getElementById('bionicReadingToggle');
-
-    function applyBionicReading(enabled) {
-      const elements = document.querySelectorAll('p, h1, h2, h3, li');
-      elements.forEach(el => {
-        if (enabled) {
-          const words = el.textContent.split(' ');
-          const bionicWords = words.map(word => {
-            if (word.length <= 2) return `<strong>${word}</strong>`;
-            const mid = Math.ceil(word.length / 2);
-            return `<strong>${word.slice(0, mid)}</strong>${word.slice(mid)}`;
-          });
-          el.innerHTML = bionicWords.join(' ');
-        } else {
-          el.textContent = el.textContent; // Reset to plain text (removes bold)
-        }
-      });
+    if (!fallbackUrl) {
+      fallbackUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
     }
 
-    bionicToggle.addEventListener('change', () => {
-      applyBionicReading(bionicToggle.checked);
+    let intentUrl = `intent://#Intent;package=${packageName};S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`;
+    if (isOutlook) {
+      intentUrl = `intent://#Intent;package=com.microsoft.office.outlook;S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`;
+    }
+
+    let opened = false;
+
+    window.location.href = intentUrl;
+
+    setTimeout(() => {
+      if (!opened) {
+        if (confirm('App not detected. Open Play Store page?')) {
+          window.open(fallbackUrl, '_blank');
+        }
+      }
+    }, 1500);
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        opened = true;
+      }
     });
-  </script>
+  }
+
+  // Open website
+  function openWebsite(url) {
+    window.open(url, '_blank');
+  }
+
+  // Open native Contacts app
+  function openContacts() {
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) {
+      window.location.href = 'intent://contacts/people/#Intent;action=android.intent.action.VIEW;category=android.intent.category.DEFAULT;end';
+    } else {
+      alert('Opening Contacts app is supported only on Android devices.');
+    }
+  }
+
+  // Stopwatch logic
+  let stopwatchInterval = null;
+  let elapsedTime = 0;
+
+  function updateStopwatchDisplay() {
+    const hours = Math.floor(elapsedTime / 3600);
+    const mins = Math.floor((elapsedTime % 3600) / 60);
+    const secs = elapsedTime % 60;
+    document.getElementById('time').textContent =
+      `${hours.toString().padStart(2,'0')}:` +
+      `${mins.toString().padStart(2,'0')}:` +
+      `${secs.toString().padStart(2,'0')}`;
+  }
+
+  function startStopwatch() {
+    if (stopwatchInterval) return;
+    stopwatchInterval = setInterval(() => {
+      elapsedTime++;
+      updateStopwatchDisplay();
+    }, 1000);
+  }
+
+  function stopStopwatch() {
+    clearInterval(stopwatchInterval);
+    stopwatchInterval = null;
+  }
+
+  function resetStopwatch() {
+    stopStopwatch();
+    elapsedTime = 0;
+    updateStopwatchDisplay();
+  }
+
+  updateStopwatchDisplay();
+
+  // Register service worker for offline/ PWA support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('sw.js')
+      .then(() => console.log('Service Worker registered'))
+      .catch(err => console.error('Service Worker registration failed:', err));
+  }
+</script>
 
 </body>
 </html>
+
 
 
 
