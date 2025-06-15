@@ -1,10 +1,12 @@
 {
-  "name": "CFR Toolbox",
+  "name": "SECamb CFR Toolbox",
   "short_name": "CFR Toolbox",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#006747",
   "theme_color": "#006747",
+  "orientation": "portrait-primary",
+  "scope": "./",
   "icons": [
     {
       "src": "cfr_toolbox_icon_192.png",
@@ -16,8 +18,10 @@
       "sizes": "512x512",
       "type": "image/png"
     }
-  ]
+  ],
+  "splash_pages": null
 }
+
 
 
 
