@@ -3,25 +3,22 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './icons/nhs.png',
-  './icons/secamb.png',
-  './icons/cfr_toolbox_icon_192.png',
-  './icons/cfr_toolbox_icon_512.png'
+  './cfr_toolbox_icon_512.png'
 ];
 
 self.addEventListener('install', event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(urlsToCache))
+    caches.open(CACHE_NAME)
+      .then(cache => cache.addAll(urlsToCache))
   );
 });
 
 self.addEventListener('activate', event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
-      )
-    )
+    caches.keys().then(keys => Promise.all(
+      keys.filter(key => key !== CACHE_NAME)
+        .map(key => caches.delete(key))
+    ))
   );
 });
 
@@ -30,4 +27,5 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
+
 
