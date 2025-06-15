@@ -5,6 +5,7 @@ const urlsToCache = [
   './manifest.json',
   './nhs.png',
   './secamb.png',
+  './cfr_toolbox_icon_192.png',
   './cfr_toolbox_icon_512.png'
 ];
 
@@ -29,3 +30,4 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
+
