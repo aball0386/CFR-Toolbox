@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>CFR Toolbox</title>
+<title>SECamb CFR Toolbox</title>
 
 <!-- PWA manifest -->
 <link rel="manifest" href="manifest.json" />
@@ -15,7 +15,7 @@
     --responder-red: #a91f1f;
     --primary-color: var(--ambulance-green);
     --background-color: #e9f0f8;
-    --text-color: white;
+    --text-color: black;
     --font-family: Arial, sans-serif;
   }
 
@@ -34,7 +34,7 @@
     background-position-x: center;
     background-position-y: center;
     background-size: 40% auto;
-    background-color:
+    background-color: var(--background-color);
     background-blend-mode: lighten;
     margin: 0;
     min-height: 100vh;
@@ -46,7 +46,7 @@
     align-items: center;
     padding: 0 10px 60px 10px;
     box-sizing: border-box;
-    color: (white);
+    color: var(--text-color);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
@@ -68,13 +68,13 @@
     background-color: var(--primary-color);
     padding: 10px 20px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
     box-sizing: border-box;
-    color: (white);
+    color: white;
     user-select: none;
   }
 
@@ -83,6 +83,16 @@
     font-size: calc(1.5rem + 1vw);
     font-weight: 600;
     color: white;
+    flex-grow: 1;
+    text-align: center;
+    user-select: text;
+  }
+
+  .header-logo {
+    height: 40px;
+    width: auto;
+    user-select: none;
+    flex-shrink: 0;
   }
 
   .toolbox {
@@ -140,7 +150,7 @@
     border-radius: 8px;
     box-shadow: 0 0 10px rgba(0,0,0,0.2);
     color: var(--text-color);
-    width: 70px;
+    width: 220px;
   }
 
   #settingsPanel label {
@@ -157,15 +167,16 @@
   #settingsBtn {
     position: fixed;
     bottom: 15px;
-    left: 50%;
-    transform: translateX(-50%);
+    right: 15px;
+    left: auto;
+    transform: none;
     background-color: var(--primary-color);
     color: white;
     border: none;
     border-radius: 50%;
-    width: 56px;
-    height: 56px;
-    font-size: 28px;
+    width: 48px;
+    height: 48px;
+    font-size: 24px;
     cursor: pointer;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
     z-index: 1100;
@@ -186,7 +197,6 @@
     font-weight: 700;
   }
 
-  /* Smaller buttons on very small screens */
   @media (max-width: 320px) {
     button {
       min-width: 140px;
@@ -199,7 +209,9 @@
 <body>
 
 <header>
+  <img src="nhs.png" alt="NHS Logo" class="header-logo" />
   <h1>CFR Toolbox</h1>
+  <img src="secamb.png" alt="SECamb Logo" class="header-logo" />
 </header>
 
 <div class="toolbox">
@@ -403,6 +415,7 @@
 
 </body>
 </html>
+
 
 
 
