@@ -18,12 +18,17 @@
   body {
     font-family: Arial, sans-serif;
     margin: 0;
-    background: url('secamb.png') no-repeat center center fixed;
+    min-height: 100vh;
+    background: url('icons/secamb.png') no-repeat center center fixed;
     background-size: 40% auto;
     background-color: #e9f0f8;
     background-blend-mode: lighten;
     position: relative;
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 10px;
+    box-sizing: border-box;
   }
 
   /* Light overlay to soften background */
@@ -40,9 +45,13 @@
     background-color: var(--ambulance-green);
     padding: 10px 20px;
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
-    gap: 20px;
+    gap: 10px;
+    max-width: 900px;
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
   }
 
   header img {
@@ -50,19 +59,25 @@
     object-fit: contain;
   }
 
-  h1 {
+  header h1 {
     color: black;
+    margin: 0;
+    font-size: 1.8rem;
+    flex-grow: 1;
     text-align: center;
-    margin: 20px 0 10px 0;
+    font-weight: 600;
+    user-select: none;
   }
 
   .toolbox {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 15px 30px;
-    max-width: 500px;
-    margin: 0 auto 40px auto;
-    padding: 0 20px;
+    width: 100%;
+    max-width: 600px;
+    margin: 40px auto 40px auto;
+    box-sizing: border-box;
+    justify-items: center;
   }
 
   button {
@@ -84,7 +99,7 @@
 
   #stopwatch {
     text-align: center;
-    margin-top: 30px;
+    margin-bottom: 40px;
   }
 
   #time {
@@ -101,11 +116,10 @@
 <body>
 
 <header>
-  <img src="nhs.png" alt="NHS Logo" />
-  <img src="secamb.png" alt="SECamb Logo" />
+  <img src="icons/nhs.png" alt="NHS Logo" />
+  <h1>SECamb CFR Toolbox</h1>
+  <img src="icons/secamb.png" alt="SECamb Logo" />
 </header>
-
-<h1>SECamb CFR Toolbox</h1>
 
 <div class="toolbox">
   <button onclick="openApp('uk.co.classprofessional.cfr')">Responder Plus</button>
@@ -120,7 +134,7 @@
 </div>
 
 <div id="stopwatch">
-  <div id="time">00:00:00:00</div>
+  <div id="time">00:00:00</div>
   <button onclick="startStopwatch()">Start</button>
   <button onclick="stopStopwatch()">Stop</button>
   <button onclick="resetStopwatch()">Reset</button>
@@ -140,25 +154,35 @@
       return;
     }
 
-    let intentUrl = `intent://#Intent;package=${packageName};end`;
-    if (isOutlook) {
-      intentUrl = `intent://#Intent;package=com.microsoft.office.outlook;end`;
+    if (!fallbackUrl) {
+      fallbackUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
     }
 
-    const iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = intentUrl;
-    document.body.appendChild(iframe);
+    let intentUrl = `intent://#Intent;package=${packageName};S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`;
+    if (isOutlook) {
+      intentUrl = `intent://#Intent;package=com.microsoft.office.outlook;S.browser_fallback_url=${encodeURIComponent(fallbackUrl)};end`;
+    }
 
-    const timeout = setTimeout(() => {
-      const playStoreUrl = `https://play.google.com/store/apps/details?id=${packageName}`;
-      const message = `App not installed. Would you like to install it from the Google Play Store?`;
-      if (confirm(message)) {
-        window.open(playStoreUrl, '_blank');
+    let opened = false;
+
+    // Try to open intent URL by setting location
+    window.location = intentUrl;
+
+    // Fallback if app doesn’t open after 2 seconds
+    setTimeout(() => {
+      if (!opened) {
+        if (confirm('App not detected. Open Play Store page?')) {
+          window.open(fallbackUrl, '_blank');
+        }
       }
-    }, 1500);
+    }, 2000);
 
-    window.addEventListener('pagehide', () => clearTimeout(timeout));
+    // Detect if page visibility changes (user leaves page)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        opened = true;
+      }
+    });
   }
 
   // Open website in new tab
@@ -171,16 +195,8 @@
     const isAndroid = /android/i.test(navigator.userAgent);
     if (isAndroid) {
       const intentUrl = 'intent://contacts/people/#Intent;action=android.intent.action.VIEW;category=android.intent.category.DEFAULT;end';
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = intentUrl;
-      document.body.appendChild(iframe);
-
-      const timeout = setTimeout(() => {
-        alert('Could not open Contacts app.');
-      }, 1500);
-
-      window.addEventListener('pagehide', () => clearTimeout(timeout));
+      window.location = intentUrl;
+      // No fallback here — Android usually handles it
     } else {
       alert('Opening Contacts app is supported only on Android devices.');
     }
@@ -231,5 +247,6 @@
 
 </body>
 </html>
+
 
 
