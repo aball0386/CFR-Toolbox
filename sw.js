@@ -3,10 +3,10 @@ const urlsToCache = [
   './',
   './index.html',
   './manifest.json',
-  './icons/nhs.png',
-  './icons/secamb.png',
-  './icons/cfr_toolbox_icon_192.png',
-  './icons/cfr_toolbox_icon_512.png'
+  './nhs.png',
+  './secamb.png',
+  './cfr_toolbox_icon_192.png',
+  './cfr_toolbox_icon_512.png'
 ];
 
 self.addEventListener('install', event => {
@@ -30,4 +30,5 @@ self.addEventListener('fetch', event => {
     caches.match(event.request).then(response => response || fetch(event.request))
   );
 });
+
 
