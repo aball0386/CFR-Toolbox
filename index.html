@@ -228,9 +228,10 @@
 
 <div id="stopwatch">
   <div id="time">00:00:00</div>
-  <button onclick="startStopwatch()">Start</button>
-  <button onclick="stopStopwatch()">Stop</button>
-  <button onclick="resetStopwatch()">Reset</button>
+  <div class="stopwatch-buttons">
+    <button id="startStopBtn" onclick="toggleStopwatch()">Start</button>
+    <button onclick="resetStopwatch()">Reset</button>
+  </div>
 </div>
 
 <button id="settingsBtn" aria-label="Open settings" onclick="toggleMenu()">⚙️</button>
