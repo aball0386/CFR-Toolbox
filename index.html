@@ -19,47 +19,37 @@
     --font-family: Arial, sans-serif;
   }
 
-  /* Theme color switch */
   .responder-red {
     --primary-color: var(--responder-red);
   }
 
-  /* Dark mode */
   .dark-mode {
     --background-color: #121212;
     --text-color: #e0e0e0;
   }
 
-  /* Bionic reading simple effect - bold first half of each word */
-  .bionic-reading * {
-    font-family: Arial, sans-serif;
-  }
-  .bionic-reading p, .bionic-reading button {
-    font-weight: normal;
-  }
-  .bionic-reading span.bionic {
-    font-weight: 700;
-  }
-
   body {
     font-family: var(--font-family);
     background: url('secamb.png') no-repeat center center fixed;
-    background-size: 60% auto;
+    background-position-x: center;
+    background-position-y: center;
+    background-size: 40% auto;
     background-color: var(--background-color);
     background-blend-mode: lighten;
     margin: 0;
     min-height: 100vh;
+    max-width: 100vw;
+    overflow-x: hidden;
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 0 10px;
+    padding: 0 10px 60px 10px;
     box-sizing: border-box;
     color: var(--text-color);
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* Light overlay */
   body::before {
     content: "";
     position: fixed;
@@ -78,9 +68,8 @@
     background-color: var(--primary-color);
     padding: 10px 20px;
     display: flex;
-    justify-content: space-between;
+    justify-content: center;
     align-items: center;
-    gap: 10px;
     max-width: 900px;
     width: 100%;
     margin: 0 auto;
@@ -89,28 +78,11 @@
     user-select: none;
   }
 
-  header img {
-    height: 50px;
-    object-fit: contain;
-  }
-
   header h1 {
     margin: 0;
-    font-size: 1.8rem;
-    flex-grow: 1;
-    text-align: center;
+    font-size: calc(1.5rem + 1vw);
     font-weight: 600;
-    color: white;
-  }
-
-  /* Menu button */
-  #menuBtn {
-    background: transparent;
-    border: none;
-    font-size: 2rem;
-    cursor: pointer;
-    color: var(--text-color);
-    user-select: none;
+    color: black;
   }
 
   .toolbox {
@@ -147,7 +119,7 @@
   }
 
   #time {
-    font-size: 2rem;
+    font-size: calc(1.5rem + 1vw);
     margin-bottom: 10px;
   }
 
@@ -156,11 +128,10 @@
     margin: 0 5px;
   }
 
-  /* Settings panel */
   #settingsPanel {
     display: none;
     position: fixed;
-    top: 60px;
+    bottom: 70px;
     right: 10px;
     background: var(--background-color);
     border: 1px solid var(--primary-color);
@@ -182,22 +153,54 @@
     margin-right: 8px;
     cursor: pointer;
   }
+
+  #settingsBtn {
+    position: fixed;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 56px;
+    height: 56px;
+    font-size: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    z-index: 1100;
+  }
+
+  #settingsBtn:hover {
+    background-color: #004d38;
+  }
+
+  /* Bionic reading simple effect */
+  .bionic-reading * {
+    font-family: Arial, sans-serif;
+  }
+  .bionic-reading p, .bionic-reading button {
+    font-weight: normal;
+  }
+  .bionic-reading span.bionic {
+    font-weight: 700;
+  }
+
+  /* Smaller buttons on very small screens */
+  @media (max-width: 320px) {
+    button {
+      min-width: 140px;
+      font-size: 1rem;
+      padding: 10px 15px;
+    }
+  }
 </style>
 </head>
 <body>
 
 <header>
-  <img src="nhs.png" alt="NHS Logo" />
   <h1>SECamb CFR Toolbox</h1>
-  <button id="menuBtn" aria-label="Toggle menu" onclick="toggleMenu()">☰</button>
-  <img src="secamb.png" alt="SECamb Logo" />
 </header>
-
-<div id="settingsPanel" role="region" aria-label="Settings menu">
-  <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
-  <label><input type="checkbox" id="themeColorToggle"> Responder Red Theme</label>
-  <label><input type="checkbox" id="bionicToggle"> Bionic Reading</label>
-</div>
 
 <div class="toolbox">
   <button onclick="openApp('uk.co.classprofessional.cfr')">Responder Plus</button>
@@ -218,8 +221,16 @@
   <button onclick="resetStopwatch()">Reset</button>
 </div>
 
+<button id="settingsBtn" aria-label="Open settings" onclick="toggleMenu()">⚙️</button>
+
+<div id="settingsPanel" role="region" aria-label="Settings menu">
+  <label><input type="checkbox" id="darkModeToggle"> Dark Mode</label>
+  <label><input type="checkbox" id="themeColorToggle"> Responder Red Theme</label>
+  <label><input type="checkbox" id="bionicToggle"> Bionic Reading</label>
+</div>
+
 <script>
-  // Menu toggle
+  // Settings menu toggle
   function toggleMenu() {
     const panel = document.getElementById('settingsPanel');
     panel.style.display = panel.style.display === 'block' ? 'none' : 'block';
@@ -274,11 +285,12 @@
     }
   };
 
-  // Simple bionic reading effect: bold first half of each word in toolbox and stopwatch
+  // Simple bionic reading effect
   function applyBionicReading() {
     const elements = document.querySelectorAll('.toolbox button, #stopwatch');
     elements.forEach(el => {
-      const words = el.textContent.split(' ');
+      const text = el.textContent || el.innerText;
+      const words = text.split(' ');
       const newHtml = words.map(word => {
         const mid = Math.ceil(word.length / 2);
         return `<span class="bionic">${word.slice(0, mid)}</span>${word.slice(mid)}`;
@@ -287,12 +299,10 @@
     });
   }
   function removeBionicReading() {
-    // Reset buttons and stopwatch text to original text content (reload page recommended)
-    // For simplicity, reload page to clear formatting:
     location.reload();
   }
 
-  // Open app with fallback to Play Store
+  // Open app with fallback
   function openApp(packageName, fallbackUrl = null, isOutlook = false) {
     if (!packageName) return;
 
@@ -316,7 +326,6 @@
     }
 
     let opened = false;
-
     window.location.href = intentUrl;
 
     setTimeout(() => {
@@ -334,12 +343,12 @@
     });
   }
 
-  // Open website
+  // Open website in new tab
   function openWebsite(url) {
     window.open(url, '_blank');
   }
 
-  // Open native Contacts app
+  // Open native Contacts app on Android
   function openContacts() {
     const isAndroid = /android/i.test(navigator.userAgent);
     if (isAndroid) {
@@ -384,7 +393,7 @@
 
   updateStopwatchDisplay();
 
-  // Register service worker for offline/ PWA support
+  // Register Service Worker
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('sw.js')
       .then(() => console.log('Service Worker registered'))
@@ -394,6 +403,7 @@
 
 </body>
 </html>
+
 
 
 
